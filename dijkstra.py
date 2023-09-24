@@ -1,4 +1,6 @@
-grafo_aeroporto = {
+from pyvis.network import Network
+
+grafo_aeroportos = {
     'A': {'B': 2, 'F': 8, 'H': 17, 'E': 7, 'D': 4, 'C': 8, 'L': 27, 'G': 21},
     'B': {'F': 6, 'C': 5, 'A': 2},
     'C': {'A': 8, 'B': 5, 'D': 2, 'E': 7, 'I': 11, 'G': 10},
@@ -45,11 +47,11 @@ grafo_aeroporto = {
 
 # Declara que todas as distancias são infinitas, já que nenhuma foi visitada
 distancias = {
-    node: float('inf') for node in grafo_aeroporto
+    node: float('inf') for node in grafo_aeroportos
 };
 
 cidades_anteriores = {
-    node: None for node in grafo_aeroporto
+    node: None for node in grafo_aeroportos
 };
 
 cidade_destino = "A";
@@ -58,8 +60,23 @@ cidade_destino = "B";
 # Declara que a distancia até o no inicial é 0
 distancias[cidade_destino] = 0
 # Cria uma lista com o grafo para guardar a informação dos aeroportos não visitados
-cidades_nao_visitadas = list(grafo_aeroporto)
+cidades_nao_visitadas = list(grafo_aeroportos)
 
 #Enquanto a lista tiver algum aeroporto nela ou seja, algum aeroporto não visitado, executa o código
-while cidades_nao_visitadas:
+# while cidades_nao_visitadas:
     # Dijkstra
+
+# Create uma rede com a library PyVis
+net = Network()
+
+# Adiciona os nós
+for node in grafo_aeroportos.keys():
+    net.add_node(node)
+
+# Adiciona as ligações
+for node, edges in grafo_aeroportos.items():
+    for target_node, weight in edges.items():
+        net.add_edge(node, target_node, value=weight)
+
+# Salva a visualização em um arquivo HTML
+net.show("grafo_aeroportos.html", notebook=False)
