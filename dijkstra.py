@@ -46,37 +46,99 @@ grafo_aeroportos = {
 }
 
 # Declara que todas as distancias são infinitas, já que nenhuma foi visitada
+# Cria um dicionario com a cidade como chave e a distancia como valor
 distancias = {
     node: float('inf') for node in grafo_aeroportos
 };
 
+# Declara que todas as cidades anteriores são nulas, já que nenhuma foi visitada
+# Cria um dicionario com a cidade como chave e a cidade anterior como valor
 cidades_anteriores = {
     node: None for node in grafo_aeroportos
 };
 
-cidade_destino = "A";
-cidade_destino = "B";
+def CidadeValida(cidade):
+    return cidade in grafo_aeroportos
+
+print("Cidades válidas: ")
+print(grafo_aeroportos.keys())
+print("Digite a cidade inicial: ")
+cidade_inicial = input()
+while not CidadeValida(cidade_inicial):
+    print("Cidade inválida, digite novamente: ")
+    cidade_inicial = input()
+
+print("Digite a cidade destino: ")
+cidade_destino = input()
+while not CidadeValida(cidade_destino):
+    print("Cidade inválida, digite novamente: ")
+    cidade_destino = input()
+
 
 # Declara que a distancia até o no inicial é 0
-distancias[cidade_destino] = 0
+distancias[cidade_inicial] = 0
 # Cria uma lista com o grafo para guardar a informação dos aeroportos não visitados
 cidades_nao_visitadas = list(grafo_aeroportos)
 
 #Enquanto a lista tiver algum aeroporto nela ou seja, algum aeroporto não visitado, executa o código
-# while cidades_nao_visitadas:
-    # Dijkstra
+while cidades_nao_visitadas:
+    #Seleciona a cidade com a menor distancia das cidades não visitadas usando funcoes lambda
+    cidade_atual = min(cidades_nao_visitadas, key=lambda node: distancias[node])
+
+    #Seleciona a cidade com a menor distancia das cidades não visitadas usando for
+    # distancia_atual = float('inf')
+    # for cidade, distancia in distancias.items():
+    #     if cidade in cidades_nao_visitadas:
+    #         if distancia < distancia_atual:
+    #             distancia_atual = distancia
+    #             cidade_atual = cidade
+
+    #Compara a distancia da cidade atual com todas as cidades vizinhas, atualizando a distancia e a cidade anterior
+    #Para cada cidade vizinha da cidade atual
+    for cidade_vizinha, peso in grafo_aeroportos[cidade_atual].items():
+        #Se a distancia da cidade atual + o peso da aresta for menor que a distancia da cidade vizinha
+        if distancias[cidade_atual] + peso < distancias[cidade_vizinha]:
+            #Atualiza a distancia da cidade vizinha
+            distancias[cidade_vizinha] = distancias[cidade_atual] + peso
+            #Atualiza a cidade anterior da cidade vizinha
+            cidades_anteriores[cidade_vizinha] = cidade_atual
+
+    #Remove a cidade atual da lista de cidades não visitadas
+    cidades_nao_visitadas.remove(cidade_atual)
+
+#Cria uma lista com o caminho percorrido
+caminho = []
+
+#Adiciona a cidade destino na lista
+caminho.append(cidade_destino)
+
+#Cria o caminho a partir das cidades anterioes de cada cidade
+while cidades_anteriores[cidade_destino] != cidade_inicial:
+    #Adiciona a cidade anterior da cidade destino na lista
+    caminho.append(cidades_anteriores[cidade_destino])
+    #Atualiza a cidade destino para a cidade anterior da cidade destino
+    cidade_destino = cidades_anteriores[cidade_destino]
+
+#Adiciona a cidade inicial na lista
+caminho.append(cidade_inicial)
+
+#Inverte a lista para mostrar o caminho correto
+caminho.reverse()
+
+#Imprime o caminho
+print(caminho)
 
 # Create uma rede com a library PyVis
 net = Network()
 
 # Adiciona os nós
-for node in grafo_aeroportos.keys():
-    net.add_node(node)
+for vertice in grafo_aeroportos.keys():
+    net.add_node(vertice)
 
 # Adiciona as ligações
-for node, edges in grafo_aeroportos.items():
-    for target_node, weight in edges.items():
-        net.add_edge(node, target_node, value=weight)
+for vertice, arestas in grafo_aeroportos.items():
+    for vertice_alvo, peso in arestas.items():
+        net.add_edge(vertice, vertice_alvo, value = peso)
 
 # Salva a visualização em um arquivo HTML
 net.show("grafo_aeroportos.html", notebook=False)
