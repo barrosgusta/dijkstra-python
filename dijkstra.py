@@ -57,35 +57,35 @@ cidades_anteriores = {
     node: None for node in grafo_aeroportos
 };
 
+# Verifica se a cidade é válida
 def CidadeValida(cidade):
     return cidade in grafo_aeroportos
 
 print("Cidades válidas: ")
 print(grafo_aeroportos.keys())
-print("Digite a cidade inicial: ")
-cidade_inicial = input()
+print()
+
+cidade_inicial = input("Digite a cidade inicial: ")
 while not CidadeValida(cidade_inicial):
-    print("Cidade inválida, digite novamente: ")
-    cidade_inicial = input()
+    cidade_inicial = input("Cidade inválida, digite novamente: ")
 
-print("Digite a cidade destino: ")
-cidade_destino = input()
+cidade_destino = input("Digite a cidade destino: ")
 while not CidadeValida(cidade_destino):
-    print("Cidade inválida, digite novamente: ")
-    cidade_destino = input()
+    cidade_destino = input("Cidade inválida, digite novamente: ")
 
+print()
 
 # Declara que a distancia até o no inicial é 0
 distancias[cidade_inicial] = 0
 # Cria uma lista com o grafo para guardar a informação dos aeroportos não visitados
 cidades_nao_visitadas = list(grafo_aeroportos)
 
-#Enquanto a lista tiver algum aeroporto nela ou seja, algum aeroporto não visitado, executa o código
+# Enquanto a lista tiver algum aeroporto nela ou seja, algum aeroporto não visitado, executa o código
 while cidades_nao_visitadas:
-    #Seleciona a cidade com a menor distancia das cidades não visitadas usando funcoes lambda
+    # Seleciona a cidade com a menor distancia das cidades não visitadas usando funcoes lambda
     cidade_atual = min(cidades_nao_visitadas, key=lambda node: distancias[node])
 
-    #Seleciona a cidade com a menor distancia das cidades não visitadas usando for
+    # Seleciona a cidade com a menor distancia das cidades não visitadas usando for
     # distancia_atual = float('inf')
     # for cidade, distancia in distancias.items():
     #     if cidade in cidades_nao_visitadas:
@@ -93,52 +93,58 @@ while cidades_nao_visitadas:
     #             distancia_atual = distancia
     #             cidade_atual = cidade
 
-    #Compara a distancia da cidade atual com todas as cidades vizinhas, atualizando a distancia e a cidade anterior
-    #Para cada cidade vizinha da cidade atual
+    # Compara a distancia da cidade atual com todas as cidades vizinhas, atualizando a distancia e a cidade anterior
+    # Para cada cidade vizinha da cidade atual
     for cidade_vizinha, peso in grafo_aeroportos[cidade_atual].items():
-        #Se a distancia da cidade atual + o peso da aresta for menor que a distancia da cidade vizinha
+        # Se a distancia da cidade atual + o peso da aresta for menor que a distancia da cidade vizinha
         if distancias[cidade_atual] + peso < distancias[cidade_vizinha]:
-            #Atualiza a distancia da cidade vizinha
+            # Atualiza a distancia da cidade vizinha
             distancias[cidade_vizinha] = distancias[cidade_atual] + peso
-            #Atualiza a cidade anterior da cidade vizinha
+            # Atualiza a cidade anterior da cidade vizinha
             cidades_anteriores[cidade_vizinha] = cidade_atual
 
-    #Remove a cidade atual da lista de cidades não visitadas
+    # Remove a cidade atual da lista de cidades não visitadas
     cidades_nao_visitadas.remove(cidade_atual)
 
-#Cria uma lista com o caminho percorrido
+# Cria uma lista com o caminho percorrido
 caminho = []
 
-#Adiciona a cidade destino na lista
+# Adiciona a cidade destino na lista
 caminho.append(cidade_destino)
 
-#Cria o caminho a partir das cidades anterioes de cada cidade
-while cidades_anteriores[cidade_destino] != cidade_inicial:
-    #Adiciona a cidade anterior da cidade destino na lista
-    caminho.append(cidades_anteriores[cidade_destino])
-    #Atualiza a cidade destino para a cidade anterior da cidade destino
-    cidade_destino = cidades_anteriores[cidade_destino]
+cidade_atual = cidade_destino
 
-#Adiciona a cidade inicial na lista
+# Cria o caminho a partir das cidades anterioes de cada cidade, comecando pela cidade destino
+while cidades_anteriores[cidade_atual] != cidade_inicial:
+    # Adiciona a cidade anterior da cidade atual na lista
+    caminho.append(cidades_anteriores[cidade_atual])
+    # Atualiza a cidade atual para a cidade anterior da cidade atual
+    cidade_atual = cidades_anteriores[cidade_atual]
+
+# Adiciona a cidade inicial na lista
 caminho.append(cidade_inicial)
 
-#Inverte a lista para mostrar o caminho correto
+# Inverte a lista para mostrar o caminho correto
 caminho.reverse()
 
-#Imprime o caminho
-print(caminho)
+# Mostra o caminho percorrido e a distancia entre as cidades
+for cidade in caminho:
+    if caminho.index(cidade) + 1 < len(caminho):
+        print(cidade, ' -> ', caminho[caminho.index(cidade) + 1], ' = ', grafo_aeroportos[cidade][caminho[caminho.index(cidade) + 1]] * 100, 'km')
 
-# Create uma rede com a library PyVis
-net = Network()
+print("Distância total: ", distancias[cidade_destino] * 100, "km")
 
-# Adiciona os nós
-for vertice in grafo_aeroportos.keys():
-    net.add_node(vertice)
+# Create uma rede com a biblioteca PyVis
+net = Network('100%', '100%')
+
+# Adiciona as cidades na visualização
+for cidade in grafo_aeroportos.keys():
+    net.add_node(cidade, color='red' if cidade in caminho else 'grey')
 
 # Adiciona as ligações
-for vertice, arestas in grafo_aeroportos.items():
-    for vertice_alvo, peso in arestas.items():
-        net.add_edge(vertice, vertice_alvo, value = peso)
+for cidade, arestas in grafo_aeroportos.items():
+    for cidade_alvo, distancia in arestas.items():
+        net.add_edge(cidade, cidade_alvo, value = distancia, label = str(distancia * 100) + "km", color = 'red' if cidade in caminho and cidade_alvo in caminho else 'grey')
 
 # Salva a visualização em um arquivo HTML
 net.show("grafo_aeroportos.html", notebook=False)
