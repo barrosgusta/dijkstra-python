@@ -1,4 +1,6 @@
 from pyvis.network import Network
+# Library usada para obter resolução do usuário
+from screeninfo import get_monitors
 
 grafo_aeroportos = {
     'A': {'B': 2, 'F': 8, 'H': 17, 'E': 7, 'D': 4, 'C': 8, 'L': 27, 'G': 21},
@@ -134,9 +136,21 @@ for cidade in caminho:
 
 print("Distância total: ", distancias[cidade_destino] * 100, "km")
 
-# Create uma rede com a biblioteca PyVis
-net = Network('100%', '100%')
+# Função que pega a resolução
+def getResolucao():
+    monitor_info = get_monitors()
+    if monitor_info:
+        largura = monitor_info[0].width
+        altura = monitor_info[0].height
+        return largura, altura
+    else:
+        return None
 
+resolucao = getResolucao()
+largura, altura = resolucao
+
+# Create uma rede com a biblioteca PyVis
+net = Network(altura, largura)
 # Adiciona as cidades na visualização
 for cidade in grafo_aeroportos.keys():
     net.add_node(cidade, color='red' if cidade in caminho else 'grey')
