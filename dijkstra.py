@@ -150,7 +150,7 @@ resolucao = getResolucao()
 largura, altura = resolucao
 
 # Create uma rede com a biblioteca PyVis
-net = Network(altura, largura)
+net = Network(altura, largura, heading='PYDIJKSTRA', select_menu=True)
 # Adiciona as cidades na visualização
 for cidade in grafo_aeroportos.keys():
     net.add_node(cidade, color='red' if cidade in caminho else 'grey')
@@ -158,7 +158,7 @@ for cidade in grafo_aeroportos.keys():
 # Adiciona as ligações
 for cidade, arestas in grafo_aeroportos.items():
     for cidade_alvo, distancia in arestas.items():
-        net.add_edge(cidade, cidade_alvo, value = distancia, label = str(distancia * 100) + "km", color = 'red' if cidade in caminho and cidade_alvo in caminho else 'grey')
+        net.add_edge(cidade, cidade_alvo, label = str(distancia * 100) + "km", color = 'red' if cidade in caminho and cidade_alvo in caminho else 'grey')
 
 # Salva a visualização em um arquivo HTML
 net.show("grafo_aeroportos.html", notebook=False)
