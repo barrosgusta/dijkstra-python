@@ -2,6 +2,7 @@ from pyvis.network import Network
 # Library usada para obter resolução do usuário
 from screeninfo import get_monitors
 
+# Declaração do grafo
 grafo_aeroportos = {
     'A': {'B': 2, 'F': 8, 'H': 17, 'E': 7, 'D': 4, 'C': 8, 'L': 27, 'G': 21},
     'B': {'F': 6, 'C': 5, 'A': 2},
@@ -87,7 +88,7 @@ while cidades_nao_visitadas:
     # Seleciona a cidade com a menor distancia das cidades não visitadas usando funcoes lambda
     cidade_atual = min(cidades_nao_visitadas, key=lambda node: distancias[node])
 
-    # Seleciona a cidade com a menor distancia das cidades não visitadas usando for
+    # Seleciona a cidade com a menor distancia das cidades não visitadas usando "for"
     # distancia_atual = float('inf')
     # for cidade, distancia in distancias.items():
     #     if cidade in cidades_nao_visitadas:
@@ -149,8 +150,9 @@ def getResolucao():
 resolucao = getResolucao()
 largura, altura = resolucao
 
-# Create uma rede com a biblioteca PyVis
+# Cria uma rede com a biblioteca PyVis
 net = Network(altura, largura, heading='PYDIJKSTRA', select_menu=True)
+
 # Adiciona as cidades na visualização
 for cidade in grafo_aeroportos.keys():
     net.add_node(cidade, color='red' if cidade in caminho else 'grey')
