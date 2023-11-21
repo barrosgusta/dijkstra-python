@@ -1,5 +1,8 @@
+# Gustavo Barros da Silveira && Ramon Valentim
+
+# Biblioteca usada para criar a visualização
 from pyvis.network import Network
-# Library usada para obter resolução do usuário
+# Biblioteca usada para obter resolução do usuário
 from screeninfo import get_monitors
 
 # Declaração do grafo
@@ -109,6 +112,40 @@ while cidades_nao_visitadas:
     # Remove a cidade atual da lista de cidades não visitadas
     cidades_nao_visitadas.remove(cidade_atual)
 
+# Função que mostra todos os caminhos possíveis usando recurssividade || não faz parte do algoritimo Dijkstra!!
+def encontra_caminhos(grafo, cidade_atual, cidade_destino, visitados, caminho_atual):
+    # Função que calcula a distancia de um caminho
+    def getDistanciaFromCamino(caminho):
+        distancia = 0
+        for cidade in caminho:
+            if caminho.index(cidade) + 1 < len(caminho):
+                distancia += grafo[cidade][caminho[caminho.index(cidade) + 1]]
+        return distancia
+    
+    # Marca a cidade atual como visitada
+    visitados.add(cidade_atual)
+    # Adiciona a cidade atual ao caminho atual
+    caminho_atual.append(cidade_atual)
+
+    # Se a cidade atual é a cidade de destino, imprime o caminho
+    if cidade_atual == cidade_destino:
+        print("Distância:", getDistanciaFromCamino(caminho_atual) * 100, "km | ", caminho_atual)
+    else:
+        # Para cada cidade vizinha não visitada
+        for cidade_vizinha in grafo[cidade_atual]:
+            if cidade_vizinha not in visitados:
+                # Recursivamente encontra caminhos a partir da cidade vizinha
+                encontra_caminhos(grafo, cidade_vizinha, cidade_destino, visitados.copy(), caminho_atual.copy())
+
+ver_caminhos_escolha = input("Deseja ver todos os caminhos possíveis? (S/N): ")
+while ver_caminhos_escolha != 'S' and ver_caminhos_escolha != 'N':
+    ver_caminhos_escolha = input("Opção inválida, digite novamente: ")
+
+if ver_caminhos_escolha == 'S':
+    print("Todos os caminhos possíveis: ")
+    # Chame a função para encontrar todos os caminhos
+    encontra_caminhos(grafo_aeroportos, cidade_inicial, cidade_destino, set(), [])
+
 # Cria uma lista com o caminho percorrido
 caminho = []
 
@@ -130,12 +167,14 @@ caminho.append(cidade_inicial)
 # Inverte a lista para mostrar o caminho correto
 caminho.reverse()
 
+print()
+print("Menor Distância: ", distancias[cidade_destino] * 100, "km")
+print("Caminho: ", caminho)
 # Mostra o caminho percorrido e a distancia entre as cidades
 for cidade in caminho:
     if caminho.index(cidade) + 1 < len(caminho):
         print(cidade, ' -> ', caminho[caminho.index(cidade) + 1], ' = ', grafo_aeroportos[cidade][caminho[caminho.index(cidade) + 1]] * 100, 'km')
 
-print("Distância total: ", distancias[cidade_destino] * 100, "km")
 
 # Função que pega a resolução
 def getResolucao():
